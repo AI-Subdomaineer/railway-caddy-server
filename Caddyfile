@@ -1,4 +1,14 @@
-:{$PORT}
-
-root * /srv
-file_server
+:{$PORT} {
+    # Remove the static file serving
+    # root * /srv
+    # file_server
+    
+    # Proxy everything to your FastAPI service
+    reverse_proxy ${BACKEND_URL} {
+        # Preserve the original host header (critical for identifying clients)
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+    }
+}
