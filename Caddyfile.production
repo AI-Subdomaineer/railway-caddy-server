@@ -1,0 +1,36 @@
+:{$PORT} {
+    # Proxy everything to your FastAPI service
+    reverse_proxy {$BACKEND_URL} {
+        # Preserve the original host header (critical for identifying clients)
+        header_up Host {host}
+        header_up X-Real-IP {remote}
+        header_up X-Forwarded-For {remote}
+        header_up X-Forwarded-Proto {scheme}
+        
+        # Health check for the backend
+        health_uri /health
+        health_interval 30s
+    }
+    
+    # Security headers
+    header {
+        # Basic security headers
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+        X-XSS-Protection "1; mode=block"
+        Referrer-Policy "strict-origin-when-cross-origin"
+        
+        # Remove server header
+        -Server
+    }
+    
+    # Enable compression
+    encode gzip zstd
+    
+    # Logging
+    log {
+        output stdout
+        format console
+        level INFO
+    }
+}
