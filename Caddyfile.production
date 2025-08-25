@@ -4,12 +4,6 @@
         # Preserve the original host header (critical for identifying clients)
         header_up Host {host}
         header_up X-Real-IP {remote}
-        header_up X-Forwarded-For {remote}
-        header_up X-Forwarded-Proto {scheme}
-        
-        # Health check for the backend
-        health_uri /health
-        health_interval 30s
     }
     
     # Security headers
