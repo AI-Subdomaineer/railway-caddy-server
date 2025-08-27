@@ -5,10 +5,13 @@
     
     # Proxy everything to your FastAPI service
     reverse_proxy ${BACKEND_URL} {
-        # Preserve the original host header (critical for identifying clients)
-        header_up Host {host}
-        header_up X-Real-IP {remote}
-        header_up X-Forwarded-For {remote}
-        header_up X-Forwarded-Proto {scheme}
+        # Forward the ORIGINAL client information (not proxy info)
+        header_up X-Forwarded-Host {http.request.host}
+        header_up X-Forwarded-For {http.request.remote_ip}
+        header_up X-Forwarded-Proto {http.request.scheme}
+        header_up X-Real-IP {http.request.remote_ip}
+        
+        # Keep Host as backend for proper routing
+        header_up Host {upstream_hostport}
     }
 }
